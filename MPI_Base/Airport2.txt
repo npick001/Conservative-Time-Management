@@ -1,0 +1,40 @@
+Airport 2
+
+Resource Pools
+number of runways
+2
+number of gates
+3
+number of baggage carts
+2
+number of fuel trucks
+2
+
+Distributions (all triangular (min, mode, max))
+landing time
+4.0 5.0 6.0
+time to taxi to the gate
+3.0 4.0 5.0
+time to dock at the gate
+1.0 2.0 3.0
+time to disembark passengers
+5.0 7.0 8.0
+time to clean cabin
+9.0 10.0 11.0
+time to embark passengers
+12.0 13.0 14.0
+time to load luggage
+15.0 16.0 17.0
+time to unload luggage
+13.0 14.0 15.0
+time to fuel plane
+18.0 19.0 20.0
+time to leave the gate
+1.0 2.0 3.0
+time to taxi to runway
+3.0 4.0 5.0
+time to take off
+6.0 7.0 8.0
+flight time
+1.0 2.0 3.0
+
