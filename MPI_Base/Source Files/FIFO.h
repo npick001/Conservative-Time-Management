@@ -58,7 +58,10 @@ public:
 
 	T *ViewEntity()
 	{
-		return(_head->t);
+		if(_head == 0) return NULL;
+		else {
+			return _head->t;
+		}
 	}
 
 	bool IsEmpty() { return (_size == 0); }

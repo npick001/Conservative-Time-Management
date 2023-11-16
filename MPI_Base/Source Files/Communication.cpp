@@ -79,17 +79,13 @@ double ReceiveNullMsg(int source)
 {
 	double time;
 	
-	// deserialize buffer data
-	int* msg_time = new int[2];
+	std::cout << "Inside recieving null msg..." << std::endl;
+
 	MPI_Request request;
-	MPI_Irecv(msg_time, 2, MPI_INTEGER, source, 0, MPI_COMM_WORLD, &request);
+	MPI_Irecv(&time, 1, MPI_DOUBLE, source, 0, MPI_COMM_WORLD, &request);
 
-	// convert buffer data to double
-	int* data_ref = (int*)(&time);
-	data_ref[0] = msg_time[0];
-	data_ref[1] = msg_time[1];
+	std::cout << "Received null msg with time " << time << std::endl;
 
-	time = *((double*)data_ref);
 	return time;
 }
 

@@ -5,6 +5,7 @@
 #include "FIFO.h"
 
 using namespace std;
+#define TOLERANCE 1E-26
 
 class SimulationExecutive
 {
@@ -20,6 +21,11 @@ public:
 				continue;
 			}
 			else {
+
+				FIFO<double>* queue = new FIFO<double>();
+				queue->AddName("Incoming Queue for " + std::to_string(i));
+				queue->AddEntity(new double(_simTime));
+
 				_incomingQueue.push_back(std::make_pair(i, new FIFO<double>()));
 			}
 			std::cout << "Incoming queue for " << i << " created on " << CommunicationRank() << " processor." << std::endl;
@@ -59,14 +65,14 @@ public:
 			// wait for each incoming queue to have a message
 			while (!EachIncomingQueueHasMsg())
 			{
-				std::cout << CommunicationRank() << ": Waiting for all incoming queues to have a message..." << std::endl;
+				//std::cout << CommunicationRank() << ": Waiting for all incoming queues to have a message..." << std::endl;
 
-				// print out queue sizes
-				for (int i = 0; i < _incomingQueue.size(); i++)
-				{
-					std::cout << CommunicationRank() << ": Queue " << i << " size: " << _incomingQueue[i].second->GetSize() << std::endl;
-				}
-				std::cout << std::endl;
+				//// print out queue sizes
+				//for (int i = 0; i < _incomingQueue.size(); i++)
+				//{
+				//	std::cout << CommunicationRank() << ": Queue " << _incomingQueue[i].first << " size: " << _incomingQueue[i].second->GetSize() << std::endl;
+				//}
+				//std::cout << std::endl;
 
 				CheckAndProcessMessages();
 			}
@@ -74,14 +80,20 @@ public:
 			// get the minimum time stamp of all the messages
 			auto min_msg = GetMinMsgTime();
 
+			//std::cout << CommunicationRank() << ": smallest event time from EventList: " << _eventList.ViewEvent()._time << std::endl;
+
 			// check if the minimum msg time stamp is less than the smallest time in the event list
 			if (min_msg.second < _eventList.ViewEvent()._time)
 			{
 				// if it is, then advance the simulation time to the minimum msg time stamp
 				_simTime = min_msg.second;
+
+				//std::cout << "Min msg time is " << min_msg.second << ", smallest event time from EventList: " << _eventList.ViewEvent()._time << std::endl;
 			}
 			else
 			{
+				std::cout << CommunicationRank() << ": min_msg_time >= smallest event time from EventList" << std::endl;
+
 				// execute the next event
 				Event* e = _eventList.GetEvent();
 
@@ -106,7 +118,7 @@ public:
 				}
 				else
 				{
-					SendNullMsg(_incomingQueue[i].first, _simTime + _lookahead);
+					SendNullMsg(_incomingQueue[i].first, (_simTime + _lookahead));
 				}
 			}
 		}
@@ -180,16 +192,33 @@ public:
 
 	static std::pair<int, double> GetMinMsgTime()
 	{
-		double min_time = *_incomingQueue[0].second->ViewEntity();
-		int min_index = 0;
-		for (int i = 1; i < _incomingQueue.size(); i++)
+		double min_time = DBL_MAX;
+		int min_index = -1;
+		for (int i = 0; i < _incomingQueue.size(); i++)
 		{
-			if (*_incomingQueue[i].second->ViewEntity() < min_time)
+			auto queue = _incomingQueue[i].second;
+			bool queue_empty = queue->IsEmpty();
+			if (queue_empty)
 			{
-				min_time = *_incomingQueue[i].second->ViewEntity();
+				std::cout << "Queue " << i << " is empty." << std::endl;
+				continue;
+			}
+			else if (*queue->ViewEntity() < TOLERANCE)
+			{
+				// if this value is below the tolerance
+				// remove this from the queue
+
+				std::cout << CommunicationRank() << ": Removing " << *queue->ViewEntity() << " from queue " << i << std::endl;
+
+				queue->GetEntity();
+				continue;
+			}
+			else if (*queue->ViewEntity() < min_time)
+			{
+				min_time = *queue->GetEntity();
 				min_index = i;
 
-				std::cout << CommunicationRank() << ": Min time is " << min_time << " from " << min_index << std::endl;
+				//std::cout << CommunicationRank() << ": Min time is " << min_time << " from " << min_index << std::endl;
 			}
 		}
 		return std::make_pair(min_index, min_time);
@@ -209,6 +238,27 @@ public:
 		}
 	}
 
+	static void ReduceQueues(Time time)
+	{
+		// remove all the time values that are less than the current simulation time 
+		// from the incoming queues.
+		for (auto pair : _incomingQueue)
+		{
+			int size = pair.second->GetSize();
+			for (int i = 0; i < size; i++)
+			{
+				if (*pair.second->ViewEntity() <= time)
+				{
+					pair.second->GetEntity();
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+
 	static void InitialNullMsgs()
 	{
 		// send null msgs to other LPs
@@ -220,7 +270,12 @@ public:
 			}
 			else
 			{
-				SendNullMsg(_incomingQueue[i].first, _simTime + _lookahead);
+				int destination = _incomingQueue[i].first;
+				int msg_time = _simTime + _lookahead;
+
+				std::cout << "Sending initial null msg to " << destination << " with time " << msg_time << std::endl;
+
+				SendNullMsg(destination, msg_time);
 			}
 		}
 	}
@@ -311,7 +366,7 @@ private:
 SimulationExecutive::EventList SimulationExecutive::_eventList;
 Time SimulationExecutive::_simTime = 0.0;
 int SimulationExecutive::_events_executed_OoO = 0;
-double SimulationExecutive::_lookahead = 1.0;
+double SimulationExecutive::_lookahead = 10.0;
 std::vector<std::pair<int, FIFO<double>*>> SimulationExecutive::_incomingQueue;
 
 std::function<void(int)> SimulationExecutive::_msgHandler = 0;
