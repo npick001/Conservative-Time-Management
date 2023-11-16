@@ -64,6 +64,35 @@ void BroadcastTerminationMessage()
 	}
 }
 
+void SendNullMsg(int dest, double time)
+{
+	int* msg_time = new int[2];
+	int* data_ref = (int*)(&time);
+	msg_time[0] = data_ref[0];
+	msg_time[1] = data_ref[1];
+
+	MPI_Request request;
+	MPI_Isend(msg_time, 2, MPI_INTEGER, dest, 0, MPI_COMM_WORLD, &request);
+}
+
+double ReceiveNullMsg(int source)
+{
+	double time;
+	
+	// deserialize buffer data
+	int* msg_time = new int[2];
+	MPI_Request request;
+	MPI_Irecv(msg_time, 2, MPI_INTEGER, source, 0, MPI_COMM_WORLD, &request);
+
+	// convert buffer data to double
+	int* data_ref = (int*)(&time);
+	data_ref[0] = msg_time[0];
+	data_ref[1] = msg_time[1];
+
+	time = *((double*)data_ref);
+	return time;
+}
+
 void Barrier()
 {
 	MPI_Barrier(MPI_COMM_WORLD);

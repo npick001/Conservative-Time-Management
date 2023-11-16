@@ -8,6 +8,8 @@ int CommunicationRank();
 int CommunicationSize();
 bool CheckForComm(int &tag, int &source);
 void BroadcastTerminationMessage();
+void SendNullMsg(int dest, double time);
+double ReceiveNullMsg(int source);
 void Barrier();
 
 class CommunicationPattern

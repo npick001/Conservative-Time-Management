@@ -1,6 +1,8 @@
 #include <iostream>
+#include <vector>
 #include "SimulationExecutive.h"
 #include "Communication.h"
+#include "FIFO.h"
 
 using namespace std;
 
@@ -10,12 +12,25 @@ public:
 	static void InitializeSimulation()
 	{
 		_simTime = 0.0;
+
+		_incomingQueue.clear();
+		for (int i = 0; i < CommunicationSize(); i++)
+		{
+			if (i != CommunicationRank()) {
+				continue;
+			}
+			else {
+				_incomingQueue.push_back(std::make_pair(i, new FIFO<double>()));
+			}
+		}
+
 	}
 
 	static Time GetSimulationTime() { return _simTime; }
 	static void RunSimulation()
 	{
-		_terminationMessagesReceived = 0;
+		InitializeSimulation();
+
 		while (_eventList.HasEvent()) {
 			Event* e = _eventList.GetEvent();
 
@@ -41,7 +56,8 @@ public:
 
 	static void RunSimulation(Time endTime)
 	{
-		_terminationMessagesReceived = 0;
+		InitializeSimulation();
+
 		while (_eventList.HasEvent() && _simTime <= endTime) {
 			Event* e = _eventList.GetEvent();
 
@@ -94,30 +110,30 @@ public:
 		int tag;
 		int source;
 		while (CheckForComm(tag, source)) {
-			CaughtMsg(source);
+
+			if (tag == 0) {
+				std::cout << CommunicationRank() << ": Null message received from " << source << std::endl;
+
+				double msg_time = ReceiveNullMsg(source);
+
+				// add msg_time to incoming queue list
+				AddNullMsgToIncomingQueue(source, msg_time);
+			}
+			else {
+				std::cout << CommunicationRank() << ": Message received from " << source << std::endl;
+				CaughtMsg(source);
+			}
 		}
 	}
 
-	static void TerminationLoop()
+	static void AddNullMsgToIncomingQueue(int source, double msg_time)
 	{
-		std::cout << CommunicationRank() << ": Waiting for termination messages..." << std::endl;
-
-		bool done = false;
-		while (!done) {
-
-			int tag;
-			int source;
-			while (!CheckForComm(tag, source))
+		for (int i = 0; i < _incomingQueue.size(); i++)
+		{
+			if (_incomingQueue[i].first == source)
 			{
-				if (tag == 0) {
-					_terminationMessagesReceived++;
-					std::cout << CommunicationRank() << ": Termination message received from " << source << std::endl;
-					std::cout << "Number of termination messages: " << _terminationMessagesReceived << std::endl;
-				}
-			}
-
-			if (_terminationMessagesReceived == CommunicationSize() - 1) {
-				done = true;
+				_incomingQueue[i].second->AddEntity(&msg_time);
+				break;
 			}
 		}
 	}
@@ -193,7 +209,7 @@ private:
 	static EventList _eventList;
 	static Time _simTime;
 	static int _events_executed_OoO;
-	static int _terminationMessagesReceived; // Comm_World_Size - 1 stopping condition
+	static std::vector<std::pair<int, FIFO<double>*>> _incomingQueue;
 
 	static std::function<void(int)> _msgHandler;
 };
@@ -201,7 +217,7 @@ private:
 SimulationExecutive::EventList SimulationExecutive::_eventList;
 Time SimulationExecutive::_simTime = 0.0;
 int SimulationExecutive::_events_executed_OoO = 0;
-int SimulationExecutive::_terminationMessagesReceived = 0;
+std::vector<std::pair<int, FIFO<double>*>> SimulationExecutive::_incomingQueue;
 
 std::function<void(int)> SimulationExecutive::_msgHandler = 0;
 
