@@ -23,6 +23,15 @@ public:
 				_events_executed_OoO++;
 			}
 
+			if (e->_time >= m_barrierPoint)
+			{
+				Barrier();
+				m_barrierPoint += m_lookahead;
+				#if TRACE == 1
+				cout << "RunSimBarrier: " << CommunicationRank() << endl;
+				#endif
+			}
+
 			_simTime = e->_time;
 			e->_ea->Execute();
 			delete e;
@@ -37,6 +46,7 @@ public:
 
 		// Wait for everyone else to finish
 		//TerminationLoop();
+		Barrier();
 	}
 
 	static void RunSimulation(Time endTime)
@@ -48,7 +58,14 @@ public:
 			if (e->_time < _simTime) {
 				_events_executed_OoO++;
 			}
-
+			if ((e->_time >= m_barrierPoint) || e->_time > endTime)
+			{
+				Barrier();
+				m_barrierPoint += m_lookahead;
+				#if TRACE == 1
+				cout << "RunSimBarrier: " << CommunicationRank() << endl;
+				#endif
+			}
 			_simTime = e->_time;
 			if (_simTime <= endTime) {
 				e->_ea->Execute();
@@ -65,6 +82,7 @@ public:
 
 		// Wait for everyone else to finish
 		//TerminationLoop();
+		Barrier();
 	}
 
 	static void ScheduleEventIn(Time delta, EventAction *ea)
@@ -82,6 +100,12 @@ public:
 	static void RegisterMsgHandler(std::function<void(int)> msgHandler)
 	{
 		_msgHandler = msgHandler;
+	}
+
+	static void setLookAhead(float l)
+	{
+		m_lookahead;
+		m_barrierPoint = m_lookahead;
 	}
 
 	static void CaughtMsg(int source)
@@ -194,7 +218,8 @@ private:
 	static Time _simTime;
 	static int _events_executed_OoO;
 	static int _terminationMessagesReceived; // Comm_World_Size - 1 stopping condition
-
+	static float m_lookahead;
+	static float m_barrierPoint;
 	static std::function<void(int)> _msgHandler;
 };
 
@@ -204,6 +229,8 @@ int SimulationExecutive::_events_executed_OoO = 0;
 int SimulationExecutive::_terminationMessagesReceived = 0;
 
 std::function<void(int)> SimulationExecutive::_msgHandler = 0;
+float SimulationExecutive::m_barrierPoint = 0.0;
+float SimulationExecutive::m_lookahead = 0.0;
 
 void InitializeSimulation()
 {
@@ -238,4 +265,9 @@ void ScheduleEventAt(Time time, EventAction*ea)
 void RegisterMsgHandler(std::function<void(int)> eventHandler)
 {
 	SimulationExecutive::RegisterMsgHandler(eventHandler);
+}
+
+void setLookAhead(float l)
+{
+	SimulationExecutive::setLookAhead(l);
 }

@@ -68,6 +68,8 @@ void WriteToFile(std::string filename, T data, int openMode) {
 	outfile.close();
 }
 
+void setLookAhead(float lookAhead);
+
 #if USE_WX
 void wxWriteToFile(std::string filename, std::string data, int openMode);
 #endif // USE_WX

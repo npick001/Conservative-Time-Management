@@ -508,6 +508,7 @@ Airport::Airport(string name, SystemOfAirports *soa)
 	getline(airportFile, s);
 	airportFile >> tmin >> tmode >> tmax;
 	t_flightTime = new Triangular(tmin, tmode, tmax);
+	setLookAhead(tmin);
 	getline(airportFile, s);
 
 	airportFile.close();
