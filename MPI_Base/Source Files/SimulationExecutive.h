@@ -18,3 +18,5 @@ void RunSimulation(Time endTime);
 void ScheduleEventIn(Time delta, EventAction *ea);
 void ScheduleEventAt(Time time, EventAction *ea);
 void RegisterMsgHandler(std::function<void(int)> msgHandler);
+
+void SendInitialNullMsgs();

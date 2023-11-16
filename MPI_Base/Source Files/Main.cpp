@@ -20,6 +20,8 @@ int main()
 	RegisterMsgHandler(msgHandler);
 	PopulateAirportWithPlanes(&airport, 10);
 
+	InitializeSimulation();
+	SendInitialNullMsgs();
 	RunSimulation(1000);
 
 	// I want to implement the termination messages, but the barrier works so well
