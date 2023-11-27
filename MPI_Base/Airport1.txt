@@ -36,6 +36,6 @@ time to taxi to runway
 time to take off
 6.0 7.0 8.0
 flight time
-1.0 2.0 3.0
+10.0 20.0 30.0
 
 

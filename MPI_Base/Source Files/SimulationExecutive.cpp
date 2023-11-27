@@ -40,8 +40,6 @@ public:
 	{
 		/*std::cout << CommunicationRank() << ": Inside SendNullMsgEA::Execute()" << std::endl;
 		std::cout << CommunicationRank() << ": Sending null message to " << _destination << std::endl;*/
-
-		SendNullMsg(_destination, _time);
 	}
 
 private:
@@ -131,7 +129,7 @@ public:
 				//std::cout << "Each incoming queue has message? " << ((EachIncomingQueueHasMsg()) ? "True" : "False") << std::endl;
 			}
 
-			std::cout << CommunicationRank() << ": Incoming/Outgoing Queue sizes: ";
+			/*std::cout << CommunicationRank() << ": Incoming/Outgoing Queue sizes: ";
 			for (int i = 0; i < _incomingQueues.size(); i++)
 			{
 				std::cout << _incomingQueues[i].GetSize() << ",";
@@ -141,7 +139,7 @@ public:
 			{
 				std::cout << _outgoingQueues[i].GetSize() << ",";
 			}
-			std::cout << std::endl;
+			std::cout << std::endl;*/
 
 			// get the minimum time stamp of all the messages
 			auto min_msg = GetMinMsgTime();
@@ -161,7 +159,7 @@ public:
 					// remove that time from the queue
 					if (i == min_msg.first)
 					{
-						std::cout << CommunicationRank() << ": Removing " << min_msg.second << " from queue " << i << std::endl;
+						//std::cout << CommunicationRank() << ": Removing " << min_msg.second << " from queue " << i << std::endl;
 						_incomingQueues[i].GetEntity();
 						break;
 					}
@@ -171,7 +169,7 @@ public:
 			}
 			else
 			{
-				std::cout << CommunicationRank() << ": min_msg_time >= smallest event time from EventList. " << min_msg.second << " >= " << _eventList.ViewEvent()._time << std::endl;
+				//std::cout << CommunicationRank() << ": min_msg_time >= smallest event time from EventList. " << min_msg.second << " >= " << _eventList.ViewEvent()._time << std::endl;
 
 				// execute the next event
 				Event* e = _eventList.GetEvent();
@@ -188,7 +186,6 @@ public:
 			}
 
 			//std::cout << CommunicationRank() << ": current sim time: " << _simTime << std::endl;
-			ReduceQueues(_simTime);
 
 			// finally send null messages to other LP's
 			// so they can advance their simulation time
@@ -202,6 +199,7 @@ public:
 				SendNullMsg(_queueProcessors[i], msg_time);
 			}
 
+			ReduceQueues(_simTime);
 			//std::cout << CommunicationRank() << ": sent all null messages." << std::endl;
 			//if (count++ == 8)
 			//	system("pause");
@@ -355,12 +353,13 @@ public:
 			{
 				if (queue.ViewEntity()->_time < time)
 				{
-					queue.GetEntity()->_ea->Execute();
+					auto event = queue.GetEntity();
+					//event->_ea->Execute();
 					msgsSent++;
 				}
 				else
 				{
-					std::cout << CommunicationRank() << ": Queue time is greater than passed time in ReduceQueue(time): " << queue.ViewEntity()->_time << " > " << time << std::endl;
+					//std::cout << CommunicationRank() << ": Queue time is greater than passed time in ReduceQueue(time): " << queue.ViewEntity()->_time << " > " << time << std::endl;
 					break;
 				}
 			}

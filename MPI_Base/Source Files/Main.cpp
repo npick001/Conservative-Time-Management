@@ -27,7 +27,7 @@ int main()
 	Barrier();
 	//std::cout << "Process " << rank << " allowed through barrier" << std::endl;
 
-	RunSimulation(1000);
+	RunSimulation(100);
 
 	// I want to implement the termination messages, but the barrier works so well
 	std::cout << "Process " << rank << " done with simulation" << std::endl;

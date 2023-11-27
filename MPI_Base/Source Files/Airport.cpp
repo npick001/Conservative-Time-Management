@@ -583,8 +583,8 @@ int Airport::GetNextDestination()
 
 void Airport::Leave(Airplane* airplane)
 {
-	//int next_destination = GetNextDestination();
-	int next_destination = CommunicationRank();
+	int next_destination = GetNextDestination();
+	//int next_destination = CommunicationRank();
 	double arrival_time = GetSimulationTime() + t_flightTime->GetRV();
 
 #if TRACE
