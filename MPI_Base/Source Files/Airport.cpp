@@ -414,6 +414,9 @@ void Airport::LeaveEA::Execute()
 void Airport::BarrierEA::Execute()
 {
 	ScheduleEventIn(_airport->_lookAhead, new BarrierEA(_airport, _airplane));
+	#if TRACE == 1
+		std::cout << "Process " << CommunicationRank() << " has reached a barrier" << std::endl;
+	#endif // TRACE
 	Barrier();
 }
 
