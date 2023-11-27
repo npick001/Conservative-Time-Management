@@ -1,1 +1,3 @@
 Airport, Airplane ID, Arrival Time, Local Simulation Time, Number of Flights, Origin, Destination
+Airport2, 2.2, 55.956887, 10.000000, 1, 1, 1
+Airport2, 2.1, 56.408870, 150.808957, 1, 1, 1

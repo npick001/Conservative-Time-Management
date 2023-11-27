@@ -3,13 +3,12 @@
 
 int main()
 {
-	std::cout << "Hello World!" << std::endl;
-
 	// simulation data viewing can be done with the Data_Viewer.xlsx file
 	// need to refresh the connections to the data source
 
 	// takes a while to run when writing all data to files,
 	// I recommend checking the directives before running.
+	// command arg: -localonly -n 2 "$(TargetPath)"
 
 	CommunicationInitialize();
 
@@ -23,16 +22,10 @@ int main()
 	PopulateAirportWithPlanes(&airport, 10);
 
 	InitializeSimulation();
-	//SendInitialNullMsgs();
 
-	// make sure all are started
-//	system("pause");
-
-	std::cout << "Process " << rank << " done with initialization " << std::endl;
+	//std::cout << "Process " << rank << " done with initialization " << std::endl;
 	Barrier();
-	std::cout << "Process " << rank << " allowed through barrier" << std::endl;
-
-//	system("pause");
+	//std::cout << "Process " << rank << " allowed through barrier" << std::endl;
 
 	RunSimulation(1000);
 

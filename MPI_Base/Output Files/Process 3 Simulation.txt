@@ -20,3 +20,5 @@ Current sim time, airport, event name, airplane id, runway queue size, gate queu
 9.799225, Airport4, ArriveGate, 4.1, 6, 0, 0, 0, 
 9.799225, Airport4, UnloadLuggage, 4.1, 6, 0, 0, 0, 
 9.799225, Airport4, FuelPlane, 4.1, 6, 0, 0, 0, 
+10.271004, Airport4, Taxi2Gate, 4.3, 6, 0, 0, 0, 
+10.271004, Airport4, Land, 4.5, 5, 0, 0, 0, 

@@ -49,7 +49,6 @@ private:
 	double _time;
 };
 
-
 class SimulationExecutive
 {
 public:
@@ -106,9 +105,8 @@ public:
 
 	static void RunSimulation(Time endTime)
 	{
-		int count = 0;
-
-		std::cout << CommunicationRank() << ": Running simulation until " << endTime << std::endl;
+		//int count = 0;
+		//std::cout << CommunicationRank() << ": Running simulation until " << endTime << std::endl;
 
 		SendInitialNullMsgs();
 		
@@ -133,18 +131,23 @@ public:
 				//std::cout << "Each incoming queue has message? " << ((EachIncomingQueueHasMsg()) ? "True" : "False") << std::endl;
 			}
 
-			std::cout << CommunicationRank() << ": Queue sizes ***: ";
+			std::cout << CommunicationRank() << ": Incoming/Outgoing Queue sizes: ";
 			for (int i = 0; i < _incomingQueues.size(); i++)
 			{
-				std::cout << _incomingQueues[i].GetSize() << ", ";
+				std::cout << _incomingQueues[i].GetSize() << ",";
+			}
+			std::cout << " / ";
+			for (int i = 0; i < _incomingQueues.size(); i++)
+			{
+				std::cout << _outgoingQueues[i].GetSize() << ",";
 			}
 			std::cout << std::endl;
 
 			// get the minimum time stamp of all the messages
 			auto min_msg = GetMinMsgTime();
 
-			std::cout << CommunicationRank() << ": min_msg processor: " << min_msg.first << std::endl;
-			std::cout << CommunicationRank() << ": smallest event time from EventList: " << _eventList.ViewEvent()._time << std::endl;
+			//std::cout << CommunicationRank() << ": min_msg processor: " << min_msg.first << std::endl;
+			//std::cout << CommunicationRank() << ": smallest event time from EventList: " << _eventList.ViewEvent()._time << std::endl;
 
 			// check if the minimum msg time stamp is less than the smallest time in the event list
 			if (min_msg.second < _eventList.ViewEvent()._time)
@@ -153,7 +156,7 @@ public:
 				_simTime = min_msg.second;
 
 				// find the right queue to remove the time from
-				for (int i = 0; i < _incomingQueues.size(); i++)
+				for (int i = 0; i < CommunicationSize(); i++)
 				{
 					// remove that time from the queue
 					if (i == min_msg.first)
@@ -163,14 +166,12 @@ public:
 						break;
 					}
 				}
-				
-				//ReduceQueues(_simTime);
 
-				std::cout << "Min msg time is " << min_msg.second << ", smallest event time from EventList: " << _eventList.ViewEvent()._time << std::endl;
+				//std::cout << "Min msg time is " << min_msg.second << ", smallest event time from EventList: " << _eventList.ViewEvent()._time << std::endl;
 			}
 			else
 			{
-				std::cout << CommunicationRank() << ": min_msg_time >= smallest event time from EventList" << std::endl;
+				std::cout << CommunicationRank() << ": min_msg_time >= smallest event time from EventList. " << min_msg.second << " >= " << _eventList.ViewEvent()._time << std::endl;
 
 				// execute the next event
 				Event* e = _eventList.GetEvent();
@@ -186,7 +187,7 @@ public:
 				delete e;
 			}
 
-			std::cout << CommunicationRank() << ": current sim time: " << _simTime << std::endl;
+			//std::cout << CommunicationRank() << ": current sim time: " << _simTime << std::endl;
 			ReduceQueues(_simTime);
 
 			// finally send null messages to other LP's
@@ -197,16 +198,16 @@ public:
 				_outgoingQueues[i].AddEntity(new Event(msg_time, new SendNullMsgEA(i, msg_time)));
 
 				// send null msg to all other lps
-				std::cout << CommunicationRank() << ": Sending null msg to " << _queueProcessors[i] << " with time " << msg_time << std::endl;
+				//std::cout << CommunicationRank() << ": Sending null msg to " << _queueProcessors[i] << " with time " << msg_time << std::endl;
 				SendNullMsg(_queueProcessors[i], msg_time);
 			}
 
-			std::cout << CommunicationRank() << ": sent all null messages." << std::endl;
-			if (count++ == 8)
-				system("pause");
+			//std::cout << CommunicationRank() << ": sent all null messages." << std::endl;
+			//if (count++ == 8)
+			//	system("pause");
 		}
 
-		std::cout << CommunicationRank() << ": Events executed out of order: " << _events_executed_OoO << std::endl;
+		//std::cout << CommunicationRank() << ": Events executed out of order: " << _events_executed_OoO << std::endl;
 
 		// "Hey im done over here!"
 		//BroadcastTerminationMessage();
@@ -240,16 +241,16 @@ public:
 	static void ProcessMsg(int tag, int source) {
 		if (tag == 0) {
 			double msg_time = ReceiveNullMsg(source);
-			std::cout << CommunicationRank() << ": Null message received from " << source << " with time " << msg_time << std::endl;
+			//std::cout << CommunicationRank() << ": Null message received from " << source << " with time " << msg_time << std::endl;
 
-			std::cout << CommunicationRank() << ": " << _incomingQueues.size() << std::endl;
+			//std::cout << CommunicationRank() << ": " << _incomingQueues.size() << std::endl;
 
 			// find the source from proc vector
 			for (int i = 0; i < _queueProcessors.size(); i++)
 			{
 				if (_queueProcessors[i] == source)
 				{
-					std::cout << CommunicationRank() << ": Adding null msg to queue " << i << std::endl;
+					//std::cout << CommunicationRank() << ": Adding null msg to queue " << i << std::endl;
 					_incomingQueues[i].AddEntity(new Event(msg_time, new RecvNullMsgEA(source, msg_time)));
 					break;
 				}
@@ -259,7 +260,7 @@ public:
 			//_incomingQueues[source].AddEntity(new Event(msg_time, new RecvNullMsgEA(source, msg_time)));
 		}
 		else {
-			std::cout << CommunicationRank() << ": Message received from " << source << std::endl;
+			//std::cout << CommunicationRank() << ": Message received from " << source << std::endl;
 			CaughtMsg(source);
 		}
 	}
@@ -279,8 +280,8 @@ public:
 		{
 			if (_incomingQueues[i].IsEmpty())
 			{
-				std::cout << "i: " << i << std::endl;
-				std::cout << "Queue: " << _queueProcessors[i] << " is empty." << std::endl;
+				//std::cout << "i: " << i << std::endl;
+				//std::cout << "Queue: " << _queueProcessors[i] << " is empty." << std::endl;
 				return false;
 			}
 		}
@@ -297,8 +298,8 @@ public:
 			bool queue_empty = queue.IsEmpty();
 			if (queue_empty)
 			{
-				std::cout << CommunicationRank() << ": Queue " << i << " is empty." << std::endl;
-				std::cout << CommunicationRank() << " continuing..." << std::endl;
+				//std::cout << CommunicationRank() << ": Queue " << i << " is empty." << std::endl;
+				//std::cout << CommunicationRank() << " continuing..." << std::endl;
 				continue;
 			}
 			else if (queue.ViewEntity()->_time < TOLERANCE)
@@ -306,7 +307,7 @@ public:
 				// if this value is below the tolerance
 				// remove this from the queue
 
-				std::cout << CommunicationRank() << ": Removing " << queue.ViewEntity()->_time << " from queue " << i << " due to being under tolerance." << std::endl;
+				//std::cout << CommunicationRank() << ": Removing " << queue.ViewEntity()->_time << " from queue " << i << " due to being under tolerance." << std::endl;
 
 				queue.GetEntity();
 				continue;
@@ -342,7 +343,7 @@ public:
 				}
 			}
 
-			std::cout << CommunicationRank() << ": Removed " << eventsRemoved << " events from queue " << std::endl;
+			//std::cout << CommunicationRank() << ": Removed " << eventsRemoved << " events from queue " << std::endl;
 		}
 
 		// send all the time values that are less than the current simulation time
@@ -354,16 +355,17 @@ public:
 			{
 				if (queue.ViewEntity()->_time < time)
 				{
-					queue.ViewEntity()->_ea->Execute();
+					queue.GetEntity()->_ea->Execute();
 					msgsSent++;
 				}
 				else
 				{
+					std::cout << CommunicationRank() << ": Queue time is greater than passed time in ReduceQueue(time): " << queue.ViewEntity()->_time << " > " << time << std::endl;
 					break;
 				}
 			}
 
-			std::cout << CommunicationRank() << ": Sent " << msgsSent << " messages from queue " << std::endl;
+			//std::cout << CommunicationRank() << ": Sent " << msgsSent << " messages from queue " << std::endl;
 		}
 	}
 
@@ -375,7 +377,7 @@ public:
 			int destination = _queueProcessors[i];
 			int msg_time = _simTime + _lookahead;
 
-			std::cout << CommunicationRank() << ": Sending initial null msg to " << destination << " with time " << msg_time << std::endl;
+			//std::cout << CommunicationRank() << ": Sending initial null msg to " << destination << " with time " << msg_time << std::endl;
 
 			SendNullMsg(destination, msg_time);
 		}
