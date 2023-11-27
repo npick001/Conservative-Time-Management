@@ -3,6 +3,8 @@
 
 int main()
 {
+	std::cout << "Hello World!" << std::endl;
+
 	// simulation data viewing can be done with the Data_Viewer.xlsx file
 	// need to refresh the connections to the data source
 
@@ -22,6 +24,16 @@ int main()
 
 	InitializeSimulation();
 	//SendInitialNullMsgs();
+
+	// make sure all are started
+//	system("pause");
+
+	std::cout << "Process " << rank << " done with initialization " << std::endl;
+	Barrier();
+	std::cout << "Process " << rank << " allowed through barrier" << std::endl;
+
+//	system("pause");
+
 	RunSimulation(1000);
 
 	// I want to implement the termination messages, but the barrier works so well

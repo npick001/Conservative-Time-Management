@@ -413,6 +413,8 @@ Airport::Airport(string name, SystemOfAirports *soa)
 	_planeID = 1;
 	_soa = soa;
 
+	std::cout << "Airport " << _name << " created" << std::endl;
+
 	ifstream airportFile(name + ".txt");
 	string s;
 	getline(airportFile, s);
