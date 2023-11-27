@@ -15,15 +15,15 @@ void CommunicationInitialize()
 	MPI_Comm_rank( MPI_COMM_WORLD, &processID);
 	MPI_Comm_size( MPI_COMM_WORLD, &numProcess);
 
-	cout << processID << " in initialize" << endl;
-	cout << processID << " done initialize" << endl;
+	cout << processID << ": in initialize" << endl;
+	cout << processID << ": done initialize" << endl;
 }
 
 void CommunicationFinalize()
 {
-	cout << processID << " in finalize" << endl;
+	cout << processID << ": in finalize" << endl;
 	MPI_Finalize();
-	cout << processID << " done finalize" << endl;
+	cout << processID << ": done finalize" << endl;
 }
 
 int CommunicationRank()
@@ -66,25 +66,20 @@ void BroadcastTerminationMessage()
 
 void SendNullMsg(int dest, double time)
 {
-	int* msg_time = new int[2];
-	int* data_ref = (int*)(&time);
-	msg_time[0] = data_ref[0];
-	msg_time[1] = data_ref[1];
-
 	MPI_Request request;
-	MPI_Isend(msg_time, 2, MPI_INTEGER, dest, 0, MPI_COMM_WORLD, &request);
+	MPI_Isend(&time, 1, MPI_DOUBLE, dest, 0, MPI_COMM_WORLD, &request);
 }
 
 double ReceiveNullMsg(int source)
 {
 	double time;
 	
-	std::cout << "Inside recieving null msg..." << std::endl;
+	std::cout << CommunicationRank() << ": Inside recieving null msg..." << std::endl;
 
 	MPI_Request request;
 	MPI_Irecv(&time, 1, MPI_DOUBLE, source, 0, MPI_COMM_WORLD, &request);
 
-	std::cout << "Received null msg with time " << time << std::endl;
+	std::cout << CommunicationRank() << ": Received null msg with time " << time << std::endl;
 
 	return time;
 }

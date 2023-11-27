@@ -1,3 +1,3 @@
 ﻿  SimulationExecutive.cpp
-C:\Users\Nick\source\repos\npick001\Conservative-Time-Managment\MPI_Base\Source Files\SimulationExecutive.cpp(274,18): warning C4244: 'initializing': conversion from 'Time' to 'int', possible loss of data
+C:\Users\Nick\source\repos\npick001\Conservative-Time-Managment\MPI_Base\Source Files\SimulationExecutive.cpp(335,18): warning C4244: 'initializing': conversion from 'Time' to 'int', possible loss of data
   MPI_Base.vcxproj -> C:\Users\Nick\source\repos\npick001\Conservative-Time-Managment\x64\Debug\MPI_Base.exe

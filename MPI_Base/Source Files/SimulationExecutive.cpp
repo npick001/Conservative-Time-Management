@@ -7,6 +7,49 @@
 using namespace std;
 #define TOLERANCE 1E-26
 
+class RecvNullMsgEA : public EventAction
+{
+public:
+	RecvNullMsgEA(int source, double time)
+	{
+		_source = source;
+		_time = time;
+	}
+
+	void Execute()
+	{
+		std::cout << CommunicationRank() << ": Inside RecvNullMsgEA::Execute()" << std::endl;
+		std::cout << CommunicationRank() << ": Null message received from " << _source << std::endl;
+	}
+
+private:
+	int _source;
+	double _time;
+};
+
+class SendNullMsgEA : public EventAction
+{
+public:
+	SendNullMsgEA(int destination, double time)
+	{
+		_destination = destination;
+		_time = time;
+	}
+
+	void Execute()
+	{
+		std::cout << CommunicationRank() << ": Inside SendNullMsgEA::Execute()" << std::endl;
+		std::cout << CommunicationRank() << ": Sending null message to " << _destination << std::endl;
+
+		SendNullMsg(_destination, _time);
+	}
+
+private:
+	int _destination;
+	double _time;
+};
+
+
 class SimulationExecutive
 {
 public:
@@ -14,19 +57,19 @@ public:
 	{
 		_simTime = 0.0;
 
-		_incomingQueue.clear();
+		_incomingQueues.clear();
 		for (int i = 0; i < CommunicationSize(); i++)
 		{
 			if (i == CommunicationRank()) {
 				continue;
 			}
 			else {
+				auto queue = FIFO<Event>();
+				_incomingQueues.push_back(queue);
 
-				FIFO<double>* queue = new FIFO<double>();
-				queue->AddName("Incoming Queue for " + std::to_string(i));
-				queue->AddEntity(new double(_simTime));
-
-				_incomingQueue.push_back(std::make_pair(i, new FIFO<double>()));
+				auto queue2 = FIFO<Event>();
+				queue2.AddEntity(new Event(_lookahead, new SendNullMsgEA(i, _lookahead)));
+				_outgoingQueues.push_back(queue2);
 			}
 			std::cout << "Incoming queue for " << i << " created on " << CommunicationRank() << " processor." << std::endl;
 		}
@@ -60,6 +103,7 @@ public:
 
 	static void RunSimulation(Time endTime)
 	{
+		SendInitialNullMsgs();
 		while (_eventList.HasEvent() && _simTime <= endTime) {
 
 			// wait for each incoming queue to have a message
@@ -67,10 +111,10 @@ public:
 			{
 				//std::cout << CommunicationRank() << ": Waiting for all incoming queues to have a message..." << std::endl;
 
-				//// print out queue sizes
-				//for (int i = 0; i < _incomingQueue.size(); i++)
+				// print out queue sizes
+				//for (int i = 0; i < _incomingQueues.size(); i++)
 				//{
-				//	std::cout << CommunicationRank() << ": Queue " << _incomingQueue[i].first << " size: " << _incomingQueue[i].second->GetSize() << std::endl;
+				//	std::cout << CommunicationRank() << ": Queue size: " << _incomingQueues[i].GetSize() << std::endl;
 				//}
 				//std::cout << std::endl;
 
@@ -88,7 +132,9 @@ public:
 				// if it is, then advance the simulation time to the minimum msg time stamp
 				_simTime = min_msg.second;
 
-				//std::cout << "Min msg time is " << min_msg.second << ", smallest event time from EventList: " << _eventList.ViewEvent()._time << std::endl;
+				//ReduceQueues(_simTime);
+
+				std::cout << "Min msg time is " << min_msg.second << ", smallest event time from EventList: " << _eventList.ViewEvent()._time << std::endl;
 			}
 			else
 			{
@@ -108,17 +154,23 @@ public:
 				delete e;
 			}
 
+			ReduceQueues(_simTime);
+
 			// finally send null messages to other LP's
 			// so they can advance their simulation time
-			for (int i = 0; i < _incomingQueue.size(); i++)
+			for (int i = 0; i < _outgoingQueues.size(); i++)
 			{
-				if (_incomingQueue[i].first == CommunicationRank())
+				if (i == CommunicationRank())
 				{
 					continue;
 				}
 				else
 				{
-					SendNullMsg(_incomingQueue[i].first, (_simTime + _lookahead));
+					auto msg_time = _simTime + _lookahead;
+					_outgoingQueues[i].AddEntity(new Event(msg_time, new SendNullMsgEA(i, msg_time)));
+
+					// send null msg to all other lps
+					SendNullMsg(i, msg_time);
 				}
 			}
 		}
@@ -156,12 +208,11 @@ public:
 
 	static void ProcessMsg(int tag, int source) {
 		if (tag == 0) {
-			std::cout << CommunicationRank() << ": Null message received from " << source << std::endl;
-
 			double msg_time = ReceiveNullMsg(source);
+			std::cout << CommunicationRank() << ": Null message received from " << source << " with time " << msg_time << std::endl;
 
 			// add msg_time to incoming queue list
-			AddNullMsgToIncomingQueue(source, msg_time);
+			_incomingQueues[source].AddEntity(new Event(msg_time, new RecvNullMsgEA(source, msg_time)));
 		}
 		else {
 			std::cout << CommunicationRank() << ": Message received from " << source << std::endl;
@@ -180,9 +231,9 @@ public:
 
 	static bool EachIncomingQueueHasMsg()
 	{
-		for (int i = 0; i < _incomingQueue.size(); i++)
+		for (int i = 0; i < _incomingQueues.size(); i++)
 		{
-			if (_incomingQueue[i].second->IsEmpty())
+			if (_incomingQueues[i].IsEmpty())
 			{
 				return false;
 			}
@@ -194,28 +245,28 @@ public:
 	{
 		double min_time = DBL_MAX;
 		int min_index = -1;
-		for (int i = 0; i < _incomingQueue.size(); i++)
+		for (int i = 0; i < _incomingQueues.size(); i++)
 		{
-			auto queue = _incomingQueue[i].second;
-			bool queue_empty = queue->IsEmpty();
+			auto queue = _incomingQueues[i];
+			bool queue_empty = queue.IsEmpty();
 			if (queue_empty)
 			{
-				std::cout << "Queue " << i << " is empty." << std::endl;
+				std::cout << CommunicationRank() << ": Queue " << i << " is empty." << std::endl;
 				continue;
 			}
-			else if (*queue->ViewEntity() < TOLERANCE)
+			else if (queue.ViewEntity()->_time < TOLERANCE)
 			{
 				// if this value is below the tolerance
 				// remove this from the queue
 
-				std::cout << CommunicationRank() << ": Removing " << *queue->ViewEntity() << " from queue " << i << std::endl;
+				std::cout << CommunicationRank() << ": Removing " << queue.ViewEntity()->_time << " from queue " << i << " due to being under tolerance." << std::endl;
 
-				queue->GetEntity();
+				queue.GetEntity();
 				continue;
 			}
-			else if (*queue->ViewEntity() < min_time)
+			else if (queue.ViewEntity()->_time < min_time)
 			{
-				min_time = *queue->GetEntity();
+				min_time = queue.ViewEntity()->_time;
 				min_index = i;
 
 				//std::cout << CommunicationRank() << ": Min time is " << min_time << " from " << min_index << std::endl;
@@ -224,56 +275,66 @@ public:
 		return std::make_pair(min_index, min_time);
 	}
 
-	static void AddNullMsgToIncomingQueue(int source, double msg_time)
-	{
-		for (int i = 0; i < _incomingQueue.size(); i++)
-		{
-			if (_incomingQueue[i].first == source)
-			{
-				std::cout << CommunicationRank() << ": Adding null message from " << source << " to incoming queue with time " << msg_time << std::endl;
-
-				_incomingQueue[i].second->AddEntity(&msg_time);
-				break;
-			}
-		}
-	}
-
 	static void ReduceQueues(Time time)
 	{
 		// remove all the time values that are less than the current simulation time 
 		// from the incoming queues.
-		for (auto pair : _incomingQueue)
+		for (auto queue : _incomingQueues)
 		{
-			int size = pair.second->GetSize();
-			for (int i = 0; i < size; i++)
+			int eventsRemoved = 0;
+			while (!queue.IsEmpty())
 			{
-				if (*pair.second->ViewEntity() <= time)
+				if (queue.ViewEntity()->_time < time)
 				{
-					pair.second->GetEntity();
+					queue.GetEntity();
+					eventsRemoved++;
 				}
 				else
 				{
 					break;
 				}
 			}
+
+			std::cout << CommunicationRank() << ": Removed " << eventsRemoved << " events from queue " << std::endl;
+		}
+
+		// send all the time values that are less than the current simulation time
+		// from the outgoing queues.
+		for (auto queue : _outgoingQueues)
+		{
+			int msgsSent = 0;
+			while (!queue.IsEmpty())
+			{
+				if (queue.ViewEntity()->_time < time)
+				{
+					queue.ViewEntity()->_ea->Execute();
+					msgsSent++;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			std::cout << CommunicationRank() << ": Sent " << msgsSent << " messages from queue " << std::endl;
 		}
 	}
 
 	static void InitialNullMsgs()
 	{
 		// send null msgs to other LPs
-		for (int i = 0; i < _incomingQueue.size(); i++)
+		for (int i = 0; i < _outgoingQueues.size(); i++)
 		{
-			if (_incomingQueue[i].first == CommunicationRank())
+			if (i == CommunicationRank())
 			{
 				continue;
 			}
 			else
 			{
-				int destination = _incomingQueue[i].first;
+				int destination = i;
 				int msg_time = _simTime + _lookahead;
 
-				std::cout << "Sending initial null msg to " << destination << " with time " << msg_time << std::endl;
+				std::cout << CommunicationRank() << ": Sending initial null msg to " << destination << " with time " << msg_time << std::endl;
 
 				SendNullMsg(destination, msg_time);
 			}
@@ -358,7 +419,8 @@ private:
 	static Time _simTime;
 	static int _events_executed_OoO;
 	static double _lookahead;
-	static std::vector<std::pair<int, FIFO<double>*>> _incomingQueue;
+	static std::vector<FIFO<Event>> _incomingQueues;
+	static std::vector<FIFO<Event>> _outgoingQueues;
 
 	static std::function<void(int)> _msgHandler;
 };
@@ -367,7 +429,8 @@ SimulationExecutive::EventList SimulationExecutive::_eventList;
 Time SimulationExecutive::_simTime = 0.0;
 int SimulationExecutive::_events_executed_OoO = 0;
 double SimulationExecutive::_lookahead = 10.0;
-std::vector<std::pair<int, FIFO<double>*>> SimulationExecutive::_incomingQueue;
+std::vector<FIFO<SimulationExecutive::Event>> SimulationExecutive::_incomingQueues;
+std::vector<FIFO<SimulationExecutive::Event>> SimulationExecutive::_outgoingQueues;
 
 std::function<void(int)> SimulationExecutive::_msgHandler = 0;
 
