@@ -59,6 +59,8 @@ private:
 	Distribution* t_takeoff;
 	Distribution* t_flightTime;
 
+	Time _lookAhead;
+
 	std::map<Airplane*, int> _gateJoin;
 
 	class AirportEventAction;
@@ -81,6 +83,7 @@ private:
 	class AcquireRunwayTakeoffEA;
 	class TakeoffEA;
 	class LeaveEA;
+	class BarrierEA;
 
 	// print trace to terminal
 	void PrintTrace(std::string eventName, Airplane* airplane);

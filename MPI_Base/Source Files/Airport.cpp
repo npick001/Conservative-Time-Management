@@ -150,6 +150,13 @@ public:
 	void Execute();
 };
 
+class Airport::BarrierEA : public AirportEventAction
+{
+	public:
+	BarrierEA(Airport* airport, Airplane* airplane) : AirportEventAction(airport, airplane) {};
+	void Execute();
+};
+
 /************************************************************/
 
 void Airport::AcquireRunwayLandEA::Execute()
@@ -404,6 +411,12 @@ void Airport::LeaveEA::Execute()
 	_airport->Leave(_airplane);
 }
 
+void Airport::BarrierEA::Execute()
+{
+	ScheduleEventIn(_airport->_lookAhead, new BarrierEA(_airport, _airplane));
+	Barrier();
+}
+
 /***************************************************************/
 
 Airport::Airport(string name, SystemOfAirports *soa)
@@ -508,7 +521,7 @@ Airport::Airport(string name, SystemOfAirports *soa)
 	getline(airportFile, s);
 	airportFile >> tmin >> tmode >> tmax;
 	t_flightTime = new Triangular(tmin, tmode, tmax);
-	setLookAhead(tmin);
+	_lookAhead = tmin;
 	getline(airportFile, s);
 
 	airportFile.close();
@@ -525,6 +538,8 @@ Airport::Airport(string name, SystemOfAirports *soa)
 	WriteToFile(m_simulation_file, sim_data_header, 1);
 	WriteToFile(m_departures_file, ad_header, 1);
 #endif // WRITE_TO_FILE
+
+	ScheduleEventAt(_lookAhead, new BarrierEA(this, 0));
 }
 
 void Airport::Arrive(Time delay, Airplane* a)
