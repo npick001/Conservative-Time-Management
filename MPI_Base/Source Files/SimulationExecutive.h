@@ -2,8 +2,8 @@
 #include <functional>
 #include "Utility.h"
 
-#define NULL_MSG_TRACE 1
-#define EXECUTION_TRACE 1
+#define NULL_MSG_TRACE 0
+#define EXECUTION_TRACE 0
 
 typedef double Time;
 

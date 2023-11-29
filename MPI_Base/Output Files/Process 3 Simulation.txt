@@ -117,33 +117,15 @@ Current sim time, airport, event name, airplane id, runway queue size, gate queu
 76.629591, Airport4, Takeoff, 4.4, 0, 3, 1, 0, 
 78.738236, Airport4, AcquireRunwayTakeoff, 4.3, 0, 3, 1, 0, 
 78.738236, Airport4, Takeoff, 4.3, 0, 3, 1, 0, 
-<<<<<<< HEAD
 81.057164, Airport4, StartClean, 4.6, 0, 3, 1, 0, 
 81.211624, Airport4, StartClean, 4.7, 0, 3, 1, 0, 
 82.794146, Airport4, Leave, 4.4, 0, 3, 1, 0, 
 85.397384, Airport4, Leave, 4.3, 0, 3, 1, 0, 
 85.560274, Airport4, LoadLuggage, 4.5, 0, 3, 1, 0, 
 88.122358, Airport4, LoadLuggage, 4.6, 0, 3, 1, 0, 
-=======
-80.711161, Airport4, AcquireRunwayLand, 1.1, 0, 3, 1, 0, 
-81.057164, Airport4, StartClean, 4.6, 1, 3, 1, 0, 
-81.211624, Airport4, StartClean, 4.7, 1, 3, 1, 0, 
-82.794146, Airport4, Leave, 4.4, 1, 3, 1, 0, 
-82.794146, Airport4, Land, 1.1, 0, 3, 1, 0, 
-85.397384, Airport4, Leave, 4.3, 0, 3, 1, 0, 
-85.560274, Airport4, LoadLuggage, 4.5, 0, 3, 1, 0, 
-88.122358, Airport4, LoadLuggage, 4.6, 0, 3, 1, 0, 
-88.494204, Airport4, Taxi2Gate, 1.1, 0, 3, 1, 0, 
->>>>>>> b3b1ad4fef7b294a1620a1cba85339aa30f26d26
 91.626734, Airport4, StartEmbark, 4.6, 0, 3, 1, 0, 
 91.661111, Airport4, StartEmbark, 4.7, 0, 3, 1, 0, 
 92.491138, Airport4, ReleaseFuelTruck, 4.6, 0, 3, 1, 0, 
 92.491138, Airport4, LeaveGate, 4.6, 0, 3, 1, 0, 
-<<<<<<< HEAD
 94.647774, Airport4, ReleaseFuelTruck, 4.7, 0, 3, 1, 0, 
 94.647774, Airport4, LeaveGate, 4.7, 0, 3, 1, 0, 
-=======
-92.593653, Airport4, AcquireGate, 1.1, 0, 3, 1, 0, 
-94.647774, Airport4, ReleaseFuelTruck, 4.7, 0, 4, 1, 0, 
-94.647774, Airport4, LeaveGate, 4.7, 0, 4, 1, 0, 
->>>>>>> b3b1ad4fef7b294a1620a1cba85339aa30f26d26

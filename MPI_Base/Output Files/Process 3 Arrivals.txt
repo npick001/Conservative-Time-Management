@@ -1,3 +1,1 @@
 Airport, Airplane ID, Arrival Time, Local Simulation Time, Number of Flights, Origin, Destination
-Airport4, 1.1, 80.711161, 51.000000, 1, 0, 3
-Airport4, 1.2, 108.187788, 94.841532, 1, 0, 3
