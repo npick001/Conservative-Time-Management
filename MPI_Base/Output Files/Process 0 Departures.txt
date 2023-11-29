@@ -1,8 +1,3 @@
 Airport, Airplane ID, Arrival Time, Local Simulation Time, Number of Flights, Origin, Destination
-<<<<<<< HEAD
-Airport1, 1.1, 69.082537, 56.679356, 0, 0, 3
-Airport1, 1.2, 100.300372, 88.312881, 0, 0, 3
-=======
-Airport1, 1.1, 80.711161, 56.679356, 0, 0, 2
-Airport1, 1.2, 103.399728, 92.648937, 0, 0, 2
->>>>>>> b3b1ad4fef7b294a1620a1cba85339aa30f26d26
+Airport1, 1.1, 90.711161, 56.679356, 0, 0, 2
+Airport1, 1.2, 118.187788, 88.312881, 0, 0, 2

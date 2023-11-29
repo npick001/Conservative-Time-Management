@@ -587,11 +587,7 @@ void Airport::Leave(Airplane* airplane)
 {
 	int next_destination = GetNextDestination();
 	//int next_destination = CommunicationRank();
-<<<<<<< HEAD
 	double arrival_time = GetSimulationTime() + t_flightTime->GetRV() + GetLookahead();
-=======
-	double arrival_time = GetSimulationTime() + t_flightTime->GetRV();
->>>>>>> b3b1ad4fef7b294a1620a1cba85339aa30f26d26
 
 #if TRACE
 	std::cout << std::endl;

@@ -23,16 +23,10 @@ int main()
 
 	InitializeSimulation();
 
-<<<<<<< HEAD
 	// make sure all are started
 	std::cout << "Process " << rank << " done with initialization." << std::endl;
 	Barrier();
 	std::cout << "Process " << rank << " allowed through barrier." << std::endl;
-=======
-	//std::cout << "Process " << rank << " done with initialization " << std::endl;
-	Barrier();
-	//std::cout << "Process " << rank << " allowed through barrier" << std::endl;
->>>>>>> b3b1ad4fef7b294a1620a1cba85339aa30f26d26
 
 	RunSimulation(100);
 
