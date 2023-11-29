@@ -49,7 +49,6 @@ private:
 	double _time;
 };
 
-
 class SimulationExecutive
 {
 public:
@@ -124,7 +123,7 @@ public:
 				//std::cout << CommunicationRank() << ": min_msg_time < smallest event time from EventList" << std::endl;
 
 				// find the right queue to remove the time from
-				for (int i = 0; i < _incomingQueues.size(); i++)
+				for (int i = 0; i < CommunicationSize(); i++)
 				{
 					// remove that time from the queue
 					if (_queueProcessors[i] == min_msg.first)
@@ -186,7 +185,7 @@ public:
 	static void ProcessMsg(int tag, int source) {
 		if (tag == 0) {
 			double msg_time = ReceiveNullMsg(source);
-			std::cout << CommunicationRank() << ": Null message received from " << source << " with time " << msg_time << std::endl;
+			//std::cout << CommunicationRank() << ": Null message received from " << source << " with time " << msg_time << std::endl;
 
 			// find the source from proc vector
 			for (int i = 0; i < _queueProcessors.size(); i++)
@@ -199,7 +198,7 @@ public:
 			}
 		}
 		else {
-			std::cout << CommunicationRank() << ": Message received from " << source << std::endl;
+			//std::cout << CommunicationRank() << ": Message received from " << source << std::endl;
 			CaughtMsg(source);
 		}
 	}
@@ -292,11 +291,12 @@ public:
 				}
 				else
 				{
+					//std::cout << CommunicationRank() << ": Queue time is greater than passed time in ReduceQueue(time): " << queue.ViewEntity()->_time << " > " << time << std::endl;
 					break;
 				}
 			}
 
-			std::cout << CommunicationRank() << ": Sent " << msgsSent << " messages from queue " << std::endl;
+			//std::cout << CommunicationRank() << ": Sent " << msgsSent << " messages from queue " << std::endl;
 		}
 	}
 

@@ -120,6 +120,7 @@ Current sim time, airport, event name, airplane id, runway queue size, gate queu
 81.057164, Airport3, StartClean, 3.6, 0, 3, 1, 0, 
 81.211624, Airport3, StartClean, 3.7, 0, 3, 1, 0, 
 82.794146, Airport3, Leave, 3.4, 0, 3, 1, 0, 
+<<<<<<< HEAD
 85.397384, Airport3, Leave, 3.3, 0, 3, 1, 0, 
 85.560274, Airport3, LoadLuggage, 3.5, 0, 3, 1, 0, 
 88.122358, Airport3, LoadLuggage, 3.6, 0, 3, 1, 0, 
@@ -129,3 +130,20 @@ Current sim time, airport, event name, airplane id, runway queue size, gate queu
 92.491138, Airport3, LeaveGate, 3.6, 0, 3, 1, 0, 
 94.647774, Airport3, ReleaseFuelTruck, 3.7, 0, 3, 1, 0, 
 94.647774, Airport3, LeaveGate, 3.7, 0, 3, 1, 0, 
+=======
+80.711161, Airport3, AcquireRunwayLand, 1.1, 0, 3, 1, 0, 
+80.711161, Airport3, Land, 1.1, 0, 3, 1, 0, 
+85.397384, Airport3, Leave, 3.3, 0, 3, 1, 0, 
+85.560274, Airport3, LoadLuggage, 3.5, 0, 3, 1, 0, 
+86.046177, Airport3, Taxi2Gate, 1.1, 0, 3, 1, 0, 
+88.122358, Airport3, LoadLuggage, 3.6, 0, 3, 1, 0, 
+90.403678, Airport3, AcquireGate, 1.1, 0, 3, 1, 0, 
+91.626734, Airport3, StartEmbark, 3.6, 0, 4, 1, 0, 
+91.661111, Airport3, StartEmbark, 3.7, 0, 4, 1, 0, 
+92.491138, Airport3, ReleaseFuelTruck, 3.6, 0, 4, 1, 0, 
+92.491138, Airport3, LeaveGate, 3.6, 0, 4, 1, 0, 
+94.647774, Airport3, ReleaseFuelTruck, 3.7, 0, 4, 1, 0, 
+94.647774, Airport3, LeaveGate, 3.7, 0, 4, 1, 0, 
+96.965568, Airport3, AcquireRunwayLand, 2.4, 0, 4, 1, 0, 
+96.965568, Airport3, Land, 2.4, 0, 4, 1, 0, 
+>>>>>>> b3b1ad4fef7b294a1620a1cba85339aa30f26d26

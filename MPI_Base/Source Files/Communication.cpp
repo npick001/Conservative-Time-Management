@@ -73,6 +73,7 @@ void SendNullMsg(int dest, double time)
 double ReceiveNullMsg(int source)
 {
 	double time;
+<<<<<<< HEAD
 	
 	//std::cout << CommunicationRank() << ": Inside recieving null msg..." << std::endl;
 
@@ -81,6 +82,10 @@ double ReceiveNullMsg(int source)
 
 	//std::cout << CommunicationRank() << ": Received null msg with time " << time << std::endl;
 
+=======
+	MPI_Request request;
+	MPI_Irecv(&time, 1, MPI_DOUBLE, source, 0, MPI_COMM_WORLD, &request);
+>>>>>>> b3b1ad4fef7b294a1620a1cba85339aa30f26d26
 	return time;
 }
 

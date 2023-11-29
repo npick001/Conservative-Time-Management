@@ -2,14 +2,26 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(I_MPI_ONEAPI_ROOT)\bin\mpiexec.exe</LocalDebuggerCommand>
+<<<<<<< HEAD
     <LocalDebuggerCommandArguments>-n 4 "$(TargetPath)"</LocalDebuggerCommandArguments>
+=======
+    <LocalDebuggerCommandArguments>-localonly -n 3 "$(TargetPath)"</LocalDebuggerCommandArguments>
+>>>>>>> b3b1ad4fef7b294a1620a1cba85339aa30f26d26
     <LocalDebuggerEnvironment>PATH=$(I_MPI_ONEAPI_ROOT)\bin\$(ConfigurationName);$(I_MPI_ONEAPI_ROOT)\libfabric\bin;$(PATH)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommand>$(I_MPI_ONEAPI_ROOT)\bin\mpiexec.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-n 4 "$(TargetPath)"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-localonly -n 3 "$(TargetPath)"</LocalDebuggerCommandArguments>
     <LocalDebuggerEnvironment>PATH=$(I_MPI_ONEAPI_ROOT)\bin\$(ConfigurationName);$(I_MPI_ONEAPI_ROOT)\libfabric\bin;$(PATH)</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerCommandArguments>-localonly -n 3 "$(TargetPath)"</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerCommandArguments>-localonly -n 3 "$(TargetPath)"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
