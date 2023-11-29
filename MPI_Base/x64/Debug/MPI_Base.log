@@ -1,2 +1,7 @@
-﻿  SimulationExecutive.cpp
+﻿  Main.cpp
+C:\Users\Nick\source\repos\npick001\Conservative-Time-Managment\MPI_Base\Source Files\Main.cpp(44,20): warning C4244: 'initializing': conversion from '_Rep' to 'double', possible loss of data
+          with
+          [
+              _Rep=__int64
+          ]
   MPI_Base.vcxproj -> C:\Users\Nick\source\repos\npick001\Conservative-Time-Managment\x64\Debug\MPI_Base.exe
