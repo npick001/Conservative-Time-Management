@@ -37,6 +37,9 @@ void Airplane::SendFlight(int rank, double arrivalTime)
 	m_arrivalTime = arrivalTime;
 	// This should send the airplane to the process indicated by rank using MPI
 	// through the CommunicationPattern
+
+	//std::cout << CommunicationRank() << ": Sending flight " << std::to_string(m_id[0]) << "." << std::to_string(m_id[1]) << " to " << rank << " with time " << m_arrivalTime << std::endl;
+
 	Send(rank);
 }
 

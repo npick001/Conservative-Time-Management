@@ -162,6 +162,8 @@ void Airport::AcquireRunwayLandEA::Execute()
 	_airport->WriteTrace("AcquireRunwayLand", _airplane);
 #endif // WRITE_TO_FILE
 
+	//std::cout << CommunicationRank() << ": Acquiring runway for flight " << _airplane->GetID()[0] << "." << _airplane->GetID()[1] << std::endl;
+
 	_airport->_runways->RequestResource(new LandEA(_airport, _airplane));
 }
 
@@ -413,7 +415,7 @@ Airport::Airport(string name, SystemOfAirports *soa)
 	_planeID = 1;
 	_soa = soa;
 
-	std::cout << "Airport " << _name << " created" << std::endl;
+	std::cout << _name << " created" << std::endl;
 
 	ifstream airportFile(name + ".txt");
 	string s;
@@ -583,9 +585,9 @@ int Airport::GetNextDestination()
 
 void Airport::Leave(Airplane* airplane)
 {
-	//int next_destination = GetNextDestination();
-	int next_destination = CommunicationRank();
-	double arrival_time = GetSimulationTime() + t_flightTime->GetRV();
+	int next_destination = GetNextDestination();
+	//int next_destination = CommunicationRank();
+	double arrival_time = GetSimulationTime() + t_flightTime->GetRV() + GetLookahead();
 
 #if TRACE
 	std::cout << std::endl;
@@ -609,6 +611,9 @@ void Airport::Leave(Airplane* airplane)
 
 	airplane->AddFlightOrigin(CommunicationRank());
 	airplane->AddFlight();
+
+	//std::cout << CommunicationRank() << ": Sending flight " << airplane->GetID()[0] << "." << airplane->GetID()[1] << " to " << next_destination << " with time " << arrival_time << std::endl;
+
 	airplane->SendFlight(next_destination, arrival_time);
 }
 

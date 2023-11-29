@@ -3,8 +3,6 @@
 
 int main()
 {
-	std::cout << "Hello World!" << std::endl;
-
 	// simulation data viewing can be done with the Data_Viewer.xlsx file
 	// need to refresh the connections to the data source
 
@@ -15,7 +13,7 @@ int main()
 
 	int rank = CommunicationRank();
 
-	Airport airport("Airport" + std::to_string(rank+1), NULL);
+	Airport airport("Airport" + std::to_string(rank + 1), NULL);
 
 	std::function<void(int)> msgHandler = std::bind(&Airport::PlaneArrival, &airport, std::placeholders::_1);
 
@@ -23,23 +21,18 @@ int main()
 	PopulateAirportWithPlanes(&airport, 10);
 
 	InitializeSimulation();
-	//SendInitialNullMsgs();
 
 	// make sure all are started
-//	system("pause");
-
-	std::cout << "Process " << rank << " done with initialization " << std::endl;
+	std::cout << "Process " << rank << " done with initialization." << std::endl;
 	Barrier();
-	std::cout << "Process " << rank << " allowed through barrier" << std::endl;
+	std::cout << "Process " << rank << " allowed through barrier." << std::endl;
 
-//	system("pause");
-
-	RunSimulation(1000);
+	RunSimulation(100);
 
 	// I want to implement the termination messages, but the barrier works so well
-	std::cout << "Process " << rank << " done with simulation" << std::endl;
+	std::cout << "Process " << rank << " done with simulation." << std::endl;
 	Barrier();
-	std::cout << "Process " << rank << " allowed through barrier" << std::endl;
+	std::cout << "Process " << rank << " allowed through barrier." << std::endl;
 
 	CommunicationFinalize();
 	return 0;

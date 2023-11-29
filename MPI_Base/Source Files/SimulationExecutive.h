@@ -2,6 +2,9 @@
 #include <functional>
 #include "Utility.h"
 
+#define NULL_MSG_TRACE 1
+#define EXECUTION_TRACE 1
+
 typedef double Time;
 
 class EventAction
@@ -20,3 +23,4 @@ void ScheduleEventAt(Time time, EventAction *ea);
 void RegisterMsgHandler(std::function<void(int)> msgHandler);
 
 void SendInitialNullMsgs();
+double GetLookahead();
